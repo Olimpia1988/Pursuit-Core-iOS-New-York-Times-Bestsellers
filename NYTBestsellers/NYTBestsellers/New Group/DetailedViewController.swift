@@ -16,6 +16,7 @@ class DetailedViewController: UIViewController {
     
     let detailedView = DetailedView()
     
+    
     override func viewDidLoad() {
         super.viewDidLoad()
     self.view.addSubview(detailedView)

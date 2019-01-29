@@ -10,6 +10,14 @@ import UIKit
 
 class MainViewController: UIViewController {
     
+    var populateCell = [BookGeneralInfo]() {
+        didSet {
+            DispatchQueue.main.async {
+                self.mainView.myCollectionView.reloadData()
+            }
+        }
+    }
+    
     var bookData = [Results]() {
         didSet {
             DispatchQueue.main.async {
@@ -53,6 +61,9 @@ extension MainViewController: UICollectionViewDataSource, UICollectionViewDelega
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = mainView.myCollectionView.dequeueReusableCell(withReuseIdentifier: "BookCell", for: indexPath) as? BookCollectionViewCell else { return UICollectionViewCell() }
+       // let booksToSet = populateCell[indexPath.row]
+        //cell.bookImage.image! = booksToSet.book_details[0].
+//        cell.textLabel.text! = booksToSet.book_details[0].author
         cell.backgroundColor = #colorLiteral(red: 0.8039215803, green: 0.8039215803, blue: 0.8039215803, alpha: 1)
         return cell 
     }
@@ -79,7 +90,15 @@ extension MainViewController: UIPickerViewDelegate, UIPickerViewDataSource {
         
         return bookData[row].list_name
     }
-//    func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-//        <#code#>
-//    }
+    func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
+        let category = bookData[row].list_name
+        BookDataAPIClient.getData(category: category) { (appError, data) in
+            if let appError = appError {
+                print(appError)
+            }
+            if let data = data{
+                dump(data)
+            }
+        }
+    }
 }

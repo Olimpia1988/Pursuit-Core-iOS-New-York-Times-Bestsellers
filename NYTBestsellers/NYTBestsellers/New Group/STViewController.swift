@@ -12,17 +12,40 @@ class STViewController: UIViewController {
 
    var stView = SettingaView()
     
+    var pickerViewSet = [Results]() {
+        didSet {
+            DispatchQueue.main.async {
+                self.stView.CathegoriesPickerView.reloadAllComponents()
+            }
+        }
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
       self.view.backgroundColor = .white
      view.addSubview(stView)
+        iWantTheData()
       stView.CathegoriesPickerView.dataSource = self
       stView.CathegoriesPickerView.delegate = self
+        
+    }
+    
+    func iWantTheData () {
+        BookCathegoryApiClient.getBookData { (appError, data) in
+            if let appError = appError {
+                print(appError)
+        }
+            if let data = data {
+                self.pickerViewSet = data
+            }
+        }
+      }
+    
     }
     
 
 
-}
+
 
 extension STViewController: UIPickerViewDataSource, UIPickerViewDelegate {
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
@@ -30,11 +53,11 @@ extension STViewController: UIPickerViewDataSource, UIPickerViewDelegate {
     }
     
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-        return 5
+        return pickerViewSet.count
     }
     
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-        return "Cathegories go here"
+       return pickerViewSet[row].list_name
     }
     
     
