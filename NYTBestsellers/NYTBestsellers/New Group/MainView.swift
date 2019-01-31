@@ -24,9 +24,12 @@ class MainView: UIView {
     
     lazy var pickerView: UIPickerView = {
         let bookPickerView = UIPickerView()
+       
+        
      return bookPickerView
         
     }()
+    
     
     
 

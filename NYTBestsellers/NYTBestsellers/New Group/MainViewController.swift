@@ -10,6 +10,8 @@ import UIKit
 
 class MainViewController: UIViewController {
     
+    
+    
     var populateCell = [BookGeneralInfo]() {
         didSet {
             DispatchQueue.main.async {
@@ -21,13 +23,13 @@ class MainViewController: UIViewController {
     var bookData = [Results]() {
         didSet {
             DispatchQueue.main.async {
-             self.mainView.pickerView.reloadAllComponents()
+                self.mainView.pickerView.reloadAllComponents()
             }
         }
     }
     let mainView = MainView()
-   
-   override func viewDidLoad() {
+    
+    override func viewDidLoad() {
         super.viewDidLoad()
         view.addSubview(mainView)
         view.backgroundColor = .white
@@ -37,6 +39,7 @@ class MainViewController: UIViewController {
         mainView.pickerView.delegate = self
         self.mainView.myCollectionView.register(BookCollectionViewCell.self, forCellWithReuseIdentifier: "BookCell")
         giveUsTheData()
+        
     }
     
     private func giveUsTheData() {
@@ -51,39 +54,92 @@ class MainViewController: UIViewController {
         }
     }
     
+    private func dataBooks(keyword: String) {
+        BookDataAPIClient.getData(category: keyword.replacingOccurrences(of: " ", with: "-")) { (appError, data) in
+            if let appError = appError {
+                print(appError)
+            } else if let data = data {
+                self.populateCell = data
+            }
+        }
+    }
+    
 }
 
 extension MainViewController: UICollectionViewDataSource, UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         
-        return 6
+        return populateCell.count
+    }
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        //this is my cell to set up the detailed view!!
+        
+        
+        guard let cell = collectionView.cellForItem(at: indexPath) as? BookCollectionViewCell else { return }
+        
+        let selectedBook = SelectedBookModel.init(imageToSet: cell.bookImage.image!, titleToSet: cell.textLabel.text!, descriptionToSet: cell.textView.text)
+//        cell.textLabel.text
+        
+        let detail = DetailedViewController.init(selectedBook: selectedBook)
+         navigationController?.pushViewController(detail, animated: true)
+        
+
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = mainView.myCollectionView.dequeueReusableCell(withReuseIdentifier: "BookCell", for: indexPath) as? BookCollectionViewCell else { return UICollectionViewCell() }
-       // let booksToSet = populateCell[indexPath.row]
-        //cell.bookImage.image! = booksToSet.book_details[0].
-//        cell.textLabel.text! = booksToSet.book_details[0].author
-        cell.backgroundColor = #colorLiteral(red: 0.8039215803, green: 0.8039215803, blue: 0.8039215803, alpha: 1)
-        return cell 
+      
+        let booksToSet = populateCell[indexPath.row]
+        cell.textLabel.text! = "Weeks on List \(booksToSet.weeks_on_list)"
+        cell.textView.text = booksToSet.book_details.first?.description
+        cell.backgroundColor = .white 
+        
+        GoogleAPIClient.getDataFromGoogle(keyword: booksToSet.book_details.first!.primary_isbn13) { (appError, data) in
+            if let appError = appError {
+                print(appError)
+            }
+            if let data = data {
+                
+                let image = data[0].volumeInfo.imageLinks.thumbnail
+                
+                DispatchQueue.main.async {
+                    if let imageData =  ImageHelper.fetchImageFromCache(urlString: image) {
+                        DispatchQueue.main.async {
+                             cell.bookImage.image = imageData
+                        }
+                       
+                    } else {
+                        ImageHelper.fetchImageFromNetwork(urlString: image, completion: { (appError, image) in
+                            if let appError = appError {
+                                print(appError)
+                            }
+                            if let image = image {
+                                DispatchQueue.main.async {
+                                      cell.bookImage.image = image
+                                }
+                              
+                            }
+                        })
+                    }
+                }
+            }
+        }
+        return cell
     }
+        
+        
     
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-//        let bookToSet = bookData[indexPath.row]
-//        let detailed = DetailedViewController.init(isbn: bookToSet.book_details[0].primary_isbn13, description: bookToSet.book_details[0].description, bookName: bookToSet.book_details[0].title, bookAuthor: bookToSet.book_details[0].author)
-//        navigationController?.pushViewController(detailed, animated: true)
-    }
-
     
-}
 
+            }
+    
 extension MainViewController: UIPickerViewDelegate, UIPickerViewDataSource {
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
         return 1
     }
     
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-       return bookData.count
+        return bookData.count
     }
     
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
@@ -91,14 +147,6 @@ extension MainViewController: UIPickerViewDelegate, UIPickerViewDataSource {
         return bookData[row].list_name
     }
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-        let category = bookData[row].list_name
-        BookDataAPIClient.getData(category: category) { (appError, data) in
-            if let appError = appError {
-                print(appError)
-            }
-            if let data = data{
-                dump(data)
-            }
-        }
+        dataBooks(keyword: bookData[row].list_name)
     }
 }

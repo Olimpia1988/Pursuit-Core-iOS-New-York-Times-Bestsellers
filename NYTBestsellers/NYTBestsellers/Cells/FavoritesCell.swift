@@ -40,7 +40,7 @@ class FavoritesCell: UICollectionViewCell {
         [bookPortada.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 11), bookPortada.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 11),bookPortada.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -11), bookPortada.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -50)].forEach{ $0.isActive = true }
         
         bookTitulo.translatesAutoresizingMaskIntoConstraints = false
-        [bookTitulo.centerYAnchor.constraint(equalTo: safeAreaLayoutGuide.centerYAnchor), bookTitulo.centerXAnchor.constraint(equalTo: safeAreaLayoutGuide.centerXAnchor)].forEach{ $0.isActive = true }
+        [bookTitulo.topAnchor.constraint(equalTo: bookPortada.bottomAnchor, constant: 22), bookTitulo.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 11), bookTitulo.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -11)].forEach{ $0.isActive = true }
     }
     
    
