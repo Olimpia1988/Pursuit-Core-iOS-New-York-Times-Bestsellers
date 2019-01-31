@@ -29,8 +29,7 @@ final class FavoriteBookModel {
         } else {
             print("\(filename) does not exist")
         }
-//        bestsellerBooks = bestsellerBooks.sorted {$0.date > $1.date}
-//        return bestsellerBooks
+
         return bestsellerBooks
     }
     
@@ -61,9 +60,9 @@ final class FavoriteBookModel {
         bestsellerBooks.remove(at: index)
         saveBook()
     }
-    
-    static func update(book: FavoriteBook, index: Int) {
-        bestsellerBooks[index] = book
+    //book: FavoriteBook,  [index] = book
+    static func update(index: Int) {
+        bestsellerBooks.remove(at: index)
         saveBook()
     }
 }

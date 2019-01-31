@@ -8,7 +8,26 @@
 
 import UIKit
 
+protocol FavoriteCellDelegate: AnyObject {
+    func actionSheet()
+}
+
 class FavoritesCell: UICollectionViewCell {
+    
+    var delegate: FavoriteCellDelegate?
+    
+    lazy var settingsButton: UIButton = {
+        let settingsButton = UIButton()
+        settingsButton.setImage(UIImage(named: "icons8-button2"), for: .normal)
+//        settingsButton.addTarget(self, action: #selector(actionSheet), for: .touchUpInside)
+        settingsButton.setTitleColor(.black, for: .normal)
+        return settingsButton
+    }()
+    
+    @objc func actionSheet() {
+        delegate?.actionSheet()
+        
+    }
     
     lazy var bookPortada: UIImageView = {
         var bookPortada = UIImageView()
@@ -27,8 +46,9 @@ class FavoritesCell: UICollectionViewCell {
         super.init(frame: UIScreen.main.bounds)
         addSubview(bookPortada)
         addSubview(bookTitulo)
+        addSubview(settingsButton)
         gimeMeConstrains()
-        backgroundColor = #colorLiteral(red: 0.832047224, green: 0.7320680618, blue: 1, alpha: 1)
+        backgroundColor = .white
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -41,8 +61,15 @@ class FavoritesCell: UICollectionViewCell {
         
         bookTitulo.translatesAutoresizingMaskIntoConstraints = false
         [bookTitulo.topAnchor.constraint(equalTo: bookPortada.bottomAnchor, constant: 22), bookTitulo.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 11), bookTitulo.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -11)].forEach{ $0.isActive = true }
+        
+        settingsButton.translatesAutoresizingMaskIntoConstraints = false
+        settingsButton.topAnchor.constraint(equalTo: topAnchor, constant: -10).isActive = true
+        settingsButton.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -10).isActive = true
+        settingsButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
+    }
+        
     }
     
    
 
-}
+

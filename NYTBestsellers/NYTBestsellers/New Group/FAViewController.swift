@@ -8,15 +8,11 @@
 
 import UIKit
 
-class FAViewController: UIViewController {
+class FAViewController: UIViewController, UIActionSheetDelegate {
  
     let favView = FavoritesView()
     
-    var favoriteData = [FavoriteBook]() {
-        didSet {
-            favView.favoritesCV.reloadData()
-        }
-    }
+    var favoriteData = [FavoriteBook]()
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -25,7 +21,8 @@ class FAViewController: UIViewController {
     }
     
     func loadFavorites() {
-        favoriteData = FavoriteBookModel.getBook()
+        self.favView.favoritesCV.reloadData()
+        self.favoriteData = FavoriteBookModel.getBook()
     }
     
    
@@ -35,11 +32,26 @@ class FAViewController: UIViewController {
         self.view.backgroundColor = .white
         view.addSubview(favView)
         loadFavorites()
-        favView.backgroundColor = .yellow
+        favView.backgroundColor = .white
         favView.favoritesCV.delegate = self
         favView.favoritesCV.dataSource = self 
     self.favView.favoritesCV.register(FavoritesCell.self, forCellWithReuseIdentifier: "FavCell")
    
+    }
+    
+    @objc func alertSheetUpdate(sender: UIButton) {
+        let indexToSender = sender.tag
+        let action = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        let delete = UIAlertAction(title: "Delete", style: .default) { (UIAlertAction) in
+            FavoriteBookModel.deleteFromSetting(atIndex: indexToSender)
+            self.loadFavorites()
+            
+            
+        }
+        action.addAction(delete)
+        let canceAction = UIAlertAction(title: "Cancel", style: .cancel)
+        action.addAction(canceAction)
+        present(action, animated: true, completion: nil)
     }
     
 }
@@ -56,6 +68,8 @@ extension FAViewController: UICollectionViewDelegate, UICollectionViewDataSource
        // cell.bookTitulo = fave.
         cell.bookTitulo.text = fave.createdAt
         cell.bookPortada.image = UIImage(data: fave.imageData)
+        cell.settingsButton.tag = indexPath.row
+        cell.settingsButton.addTarget(self, action: #selector(alertSheetUpdate(sender:)), for: .touchUpInside)
         return cell 
     }
     

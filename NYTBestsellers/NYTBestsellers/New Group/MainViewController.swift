@@ -39,8 +39,10 @@ class MainViewController: UIViewController {
         mainView.pickerView.delegate = self
         self.mainView.myCollectionView.register(BookCollectionViewCell.self, forCellWithReuseIdentifier: "BookCell")
         giveUsTheData()
-        
+        dataBooks(keyword: "Humor")
     }
+    
+
     
     private func giveUsTheData() {
         BookCathegoryApiClient.getBookData { (appError, data) in
@@ -63,6 +65,8 @@ class MainViewController: UIViewController {
             }
         }
     }
+    
+
     
 }
 
