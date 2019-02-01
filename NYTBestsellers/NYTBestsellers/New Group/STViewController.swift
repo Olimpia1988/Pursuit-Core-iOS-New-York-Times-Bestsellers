@@ -9,6 +9,8 @@
 import UIKit
 
 class STViewController: UIViewController {
+    
+    var listName = FavoriteBookModel.getBook()
 
    var stView = SettingaView()
     
@@ -58,6 +60,10 @@ extension STViewController: UIPickerViewDataSource, UIPickerViewDelegate {
     
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
        return pickerViewSet[row].list_name
+    }
+    
+    func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
+        UserDefaults.standard.set(pickerViewSet[row].list_name, forKey: "categories")
     }
     
     // populate USER DEFAULTS

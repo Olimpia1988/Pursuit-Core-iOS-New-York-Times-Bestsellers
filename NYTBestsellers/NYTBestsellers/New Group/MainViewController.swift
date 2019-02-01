@@ -39,7 +39,11 @@ class MainViewController: UIViewController {
         mainView.pickerView.delegate = self
         self.mainView.myCollectionView.register(BookCollectionViewCell.self, forCellWithReuseIdentifier: "BookCell")
         giveUsTheData()
+        if let category = UserDefaults.standard.object(forKey: "categories") as? String {
+            dataBooks(keyword: category)
+        } else {
         dataBooks(keyword: "Humor")
+        }
     }
     
 
